@@ -2,10 +2,19 @@ Package: rccola
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: c(person("Shawn",    "Garbett",  email = "Shawn.Garbett@vumc.org",        role = c("aut", "cre")),
+           c(person("Hui",      "Wu",       email = "Hui.Wu@vumc.org",               role = c("aut")),
+           c(person("Cole",     "Beck",     email = "Cole.Beck@vumc.org",            role = c("aut"))
+             )
+Author: Shawn Garbett [aut, cre],
+  Hui Wu [aut],
+  Cole Beck [aut]
+Maintainer: Shawn Garbett <Shawn.Garbett@vumc.org>
+Description: The handling of an API_KEY (misnomer for password) for protected
+    data can be difficult. This package provides convience functions for 
+    entering / handling API_KEYs and knitting documents by pulling data into memory.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Imports: redcapAPI, getPass, encryptr
+URL: https://github.com/spgarbet/rccola
