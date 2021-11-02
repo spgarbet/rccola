@@ -3,9 +3,9 @@ Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
 Authors@R: c(person("Shawn",    "Garbett",  email = "Shawn.Garbett@vumc.org",        role = c("aut", "cre")),
-           c(person("Hui",      "Wu",       email = "Hui.Wu@vumc.org",               role = c("aut")),
-           c(person("Cole",     "Beck",     email = "Cole.Beck@vumc.org",            role = c("aut"))
-             )
+             person("Hui",      "Wu",       email = "Hui.Wu@vumc.org",               role = c("aut")),
+             person("Cole",     "Beck",     email = "Cole.Beck@vumc.org",            role = c("aut"))
+            )
 Author: Shawn Garbett [aut, cre],
   Hui Wu [aut],
   Cole Beck [aut]
@@ -16,5 +16,5 @@ Description: The handling of an API_KEY (misnomer for password) for protected
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: redcapAPI, getPass, encryptr
+Imports: redcapAPI, getPass, yaml
 URL: https://github.com/spgarbet/rccola
