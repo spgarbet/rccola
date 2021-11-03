@@ -1,6 +1,6 @@
 Package: rccola
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Safely Manage API_KEYS and load data from RedCap
 Version: 0.1.0
 Authors@R: c(person("Shawn",    "Garbett",  email = "Shawn.Garbett@vumc.org",        role = c("aut", "cre")),
              person("Hui",      "Wu",       email = "Hui.Wu@vumc.org",               role = c("aut")),
@@ -18,3 +18,4 @@ Encoding: UTF-8
 LazyData: true
 Imports: redcapAPI, getPass, yaml
 URL: https://github.com/spgarbet/rccola
+RoxygenNote: 7.1.2

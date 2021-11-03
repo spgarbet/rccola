@@ -20,9 +20,11 @@ split_path <- function(path) {
     rev(setdiff(strsplit(path,"/|\\\\")[[1]], ""))
 }
 
+#' @importFrom redcapAPI redcapConnection
+#' @importFrom redcapAPI exportRecords
 readRC <- function(url, key)
 {
-  exportRecords(redcapConnection(url=url, token=key), factors = TRUE, labels = TRUE)
+  redcapAPI::exportRecords(redcapAPI::redcapConnection(url=url, token=key), factors = TRUE, labels = TRUE)
 }
 
 #' Load data requested into current environment from RedCap
@@ -47,20 +49,26 @@ readRC <- function(url, key)
 #'
 #' @param variables A list of strings that define the variables to fill with RedCap data
 #' @param apiUrl The api interface to the RedCap instance to use. defaults to the Vanderbilt instance.
-#'
+#' @param envir The target environment for the data. Defaults to .Global
 #' @return Nothing
 #'
-#' @example
+#' @examples
 #' \donttest{loadFromRedcap(data)}
+#'
+#' @importFrom getPass getPass
+#' @importFrom yaml read_yaml
 #'
 #' @export
 #'
-loadFromRedcap <- function(variables, apiUrl="https://redcap.vanderbilt.edu/api/")
+loadFromRedcap <- function(variables, apiUrl="https://redcap.vanderbilt.edu/api/",
+                           envir=NULL)
 {
-  p <- parent.env(environment())
+  # FIXME: This just seems wrong.
+  #dest <- parent.env(parent.env(parent.env(parent.env(environment()))))
+  dest <- if(is.null(envir)) globalenv() else envir
 
   # If the data exists, clear from memory
-  for(i in variables) if(exists(i)) rm(i, inherits=TRUE)
+  for(i in variables) if(exists(i, envir=dest)) rm(i, envir=dest)
 
   # Use config if it exists
   config_file <- file.path("..", paste0(split_path(getwd())[1],".yml"))
@@ -70,7 +78,7 @@ loadFromRedcap <- function(variables, apiUrl="https://redcap.vanderbilt.edu/api/
 
     tryCatch(
       for(i in variables)
-        assign(i, readRC(config$apiURL, config$apiKeys[[i]]), envir=p),
+        assign(i, readRC(config$apiURL, config$apiKeys[[i]]), envir=dest),
       error=function(e) stop(e)
     )
 
@@ -84,7 +92,7 @@ loadFromRedcap <- function(variables, apiUrl="https://redcap.vanderbilt.edu/api/
   for(i in variables)
   {
     # If the API_KEY doesn't exist go look for it
-    if(!exists(i, envir=api))
+    if(!exists(i, envir=api) || is.null(api[[i]]) || is.na(api[[i]]) || api[[i]]=='')
     {
       # Pull from knit with params if that exists
       if(exists("params") && !is.null(params[[i]]) && params[[i]] != "")
@@ -93,13 +101,12 @@ loadFromRedcap <- function(variables, apiUrl="https://redcap.vanderbilt.edu/api/
         api[[i]] <- params[[i]]
       } else # Ask the user for it
       {
-        api[[i]] <- getPass(msg=paste("Please enter RedCap API_KEY for", i))
+        api[[i]] <- getPass::getPass(msg=paste("Please enter RedCap API_KEY for", i))
       }
     }
 
-    rcon <- redcapConnection(url=apiUrl, token=api[[i]])
     tryCatch(
-      assign(i, exportRecords(rcon, factors = TRUE, labels = TRUE), envir=p),
+      assign(i, readRC(apiUrl, api[[i]]), envir=dest),
       error = function(e)
       {
         rm(i, envir = api)
