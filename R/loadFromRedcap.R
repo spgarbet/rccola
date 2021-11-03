@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Turn a passed pformat into a function (or leave alone)
-
 split_path <- function(path) {
     rev(setdiff(strsplit(path,"/|\\\\")[[1]], ""))
 }
@@ -60,11 +58,12 @@ readRC <- function(url, key)
 #'
 #' @export
 #'
-loadFromRedcap <- function(variables, apiUrl="https://redcap.vanderbilt.edu/api/",
-                           envir=NULL)
+loadFromRedcap <- function(variables,
+                           apiUrl="https://redcap.vanderbilt.edu/api/",
+                           envir=NULL,
+                           keyring=NULL)
 {
-  # FIXME: This just seems wrong.
-  #dest <- parent.env(parent.env(parent.env(parent.env(environment()))))
+  # Use the global environment for variable storage unless one was specified
   dest <- if(is.null(envir)) globalenv() else envir
 
   # If the data exists, clear from memory
@@ -92,7 +91,7 @@ loadFromRedcap <- function(variables, apiUrl="https://redcap.vanderbilt.edu/api/
   for(i in variables)
   {
     # If the API_KEY doesn't exist go look for it
-    if(!exists(i, envir=api) || is.null(api[[i]]) || is.na(api[[i]]) || api[[i]]=='')
+    if(!exists(i, envir=api, inherits=FALSE) || is.null(api[[i]]) || is.na(api[[i]]) || api[[i]]=='')
     {
       # Pull from knit with params if that exists
       if(exists("params") && !is.null(params[[i]]) && params[[i]] != "")
