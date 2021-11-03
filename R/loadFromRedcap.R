@@ -20,9 +20,13 @@ split_path <- function(path) {
 
 #' @importFrom redcapAPI redcapConnection
 #' @importFrom redcapAPI exportRecords
-readRC <- function(url, key)
+readRC <- function(url, key, ...)
 {
-  redcapAPI::exportRecords(redcapAPI::redcapConnection(url=url, token=key), factors = TRUE, labels = TRUE)
+  con <- redcapAPI::redcapConnection(url=url, token=key)
+  args <- c(rcon = con, list(...))
+  if(!('factors' %in% names(args))) args$factors <- TRUE
+  if(!('labels' %in% names(args))) args$labels <- TRUE
+  do.call(redcapAPI::exportRecords, args)
 }
 
 #' Load data requested into current environment from RedCap
@@ -48,6 +52,8 @@ readRC <- function(url, key)
 #' @param variables A list of strings that define the variables to fill with RedCap data
 #' @param apiUrl The api interface to the RedCap instance to use. defaults to the Vanderbilt instance.
 #' @param envir The target environment for the data. Defaults to .Global
+#' @param keyring Potential keyring, not used by default.
+#' @param \dots Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.
 #' @return Nothing
 #'
 #' @examples
@@ -61,7 +67,7 @@ readRC <- function(url, key)
 loadFromRedcap <- function(variables,
                            apiUrl="https://redcap.vanderbilt.edu/api/",
                            envir=NULL,
-                           keyring=NULL)
+                           keyring=NULL, ...)
 {
   # Use the global environment for variable storage unless one was specified
   dest <- if(is.null(envir)) globalenv() else envir
@@ -77,7 +83,7 @@ loadFromRedcap <- function(variables,
 
     tryCatch(
       for(i in variables)
-        assign(i, readRC(config$apiURL, config$apiKeys[[i]]), envir=dest),
+        assign(i, readRC(config$apiURL, config$apiKeys[[i]], ...), envir=dest),
       error=function(e) stop(e)
     )
 

@@ -4,12 +4,24 @@
 \alias{loadFromRedcap}
 \title{Load data requested into current environment from RedCap}
 \usage{
-loadFromRedcap(variables, apiUrl = "https://redcap.vanderbilt.edu/api/")
+loadFromRedcap(
+  variables,
+  apiUrl = "https://redcap.vanderbilt.edu/api/",
+  envir = NULL,
+  keyring = NULL,
+  ...
+)
 }
 \arguments{
 \item{variables}{A list of strings that define the variables to fill with RedCap data}
 
 \item{apiUrl}{The api interface to the RedCap instance to use. defaults to the Vanderbilt instance.}
+
+\item{envir}{The target environment for the data. Defaults to .Global}
+
+\item{keyring}{Potential keyring, not used by default.}
+
+\item{\dots}{Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.}
 }
 \value{
 Nothing
