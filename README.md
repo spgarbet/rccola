@@ -6,7 +6,7 @@ A project to assist in the management of API_KEYS to pull RedCap data in a safe 
 
 An API_KEY is your username and password rolled into one. This long hexadecimal string provides access into RedCap repositories. If these repositories contain PHI, HIPAA has a $100 per patient record minimum fine. This means the inadvertent leakage of a RedCap API_KEY is *expensive*.
 
-The risk of exposure is very high if one simply hard codes the API_KEY into a report. If one is sharing with colleagues, git is commonly used to version code. The moment such code is pushed to a public repository such as [github.com](https://github.com], that API_KEY is now shared with the world, and by proxy potentially all that clinical data. 
+The risk of exposure is very high if one simply hard codes the API_KEY into a report. If one is sharing with colleagues, git is commonly used to version code. The moment such code is pushed to a public repository such as [github.com](https://github.com), that API_KEY is now shared with the world, and by proxy potentially all that clinical data. 
 
 Even storing the API_KEY(s) in a local file in the project is bad for similar reasons. It's quite easy for git to pick up that file and begin versioning it.
 
