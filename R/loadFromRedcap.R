@@ -22,11 +22,7 @@ split_path <- function(path) {
 #' @importFrom redcapAPI exportRecords
 readRC <- function(url, key, ...)
 {
-  con <- redcapAPI::redcapConnection(url=url, token=key)
-  args <- c(rcon = con, list(...))
-  if(!('factors' %in% names(args))) args$factors <- TRUE
-  if(!('labels' %in% names(args))) args$labels <- TRUE
-  do.call(redcapAPI::exportRecords, args)
+  redcapAPI::exportRecords(redcapAPI::redcapConnection(url=url, token=key), ...)
 }
 
 #' Load data requested into current environment from RedCap
