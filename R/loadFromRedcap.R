@@ -29,8 +29,8 @@ key_saved <- function(envir, key)
 {
   exists(key, envir=envir, inherits=FALSE) &&
   !is.null(envir[[key]])                   &&
-  !is.na(api[[key]])                       &&
-  !api[[key]]==''
+  !is.na(envir[[key]])                       &&
+  !envir[[key]]==''
 }
 
 #' Load data requested into current environment from RedCap
@@ -98,6 +98,7 @@ loadFromRedcap <- function(variables,
 
     return(invisible())
   }
+  browser()
 
   # Create an environment to house API_KEYS locally
   if(!exists("apiKeyStore", inherits=FALSE)) apiKeyStore <- new.env()
@@ -120,7 +121,7 @@ loadFromRedcap <- function(variables,
     {
       if(!is.null(keyring) &&
          keyring %in% (keyring::keyring_list()[,1]) &&
-         i %in% keyring::key_list("rccola", keyring))
+         i %in% keyring::key_list("rccola", keyring)[,2])
       {
         apiKeyStore[[i]] <- keyring::key_get("rccola", i, keyring)
       }
