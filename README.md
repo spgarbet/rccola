@@ -61,5 +61,10 @@ For local knitting from RStudio, the header of the file should look something li
     
 The document can now be knitted with `Knit -> Knit with Parameters`. It also works when running chunks from the console. Two variables are now sitting in memory `intake` and `details` with the contents of those two RedCap repositories.
 
+## Keyring Storage
+
+See the [keyring](https://github.com/r-lib/keyring) github page for details on configuring your keyring storage to use a prefered service if you desire.
+
+The "service" used is "rccola". The keyring created by this package will be whatever string you pass. Thus API_KEYs could be shared between reports as well via using the same keyring. However, since they are keyed via their variable names--if one used a single keyring for all each RedCap database would need a distinct variable name that would be consistent across projects. Otherwise, there would be a namespace collision and it would ask for the API_KEY each time projects were switched.
 
     
