@@ -86,6 +86,7 @@ loadFromRedcap <- function(variables,
     return(invisible())
   }
 
+
   # Create an environment to house API_KEYS locally
   if(!exists("api")) api <- new.env()
 
@@ -93,6 +94,18 @@ loadFromRedcap <- function(variables,
   for(i in variables)
   {
     # If the API_KEY doesn't exist go look for it
+
+    # Does it exist in a secret keyring, use that
+    if(!exists(i, envir=api, inherits=FALSE) || is.null(api[[i]]) || is.na(api[[i]]) || api[[i]]=='')
+    {
+      if(!is.null(keyring) &&
+         keyring %in% default_backend()$keyring_list()[,1] &&
+         i %in% key_list("rccola", keyring))
+      {
+        api[[i]] <- get_key("rccola", i, keyring)
+      }
+    }
+    # Check again if it's set properly
     if(!exists(i, envir=api, inherits=FALSE) || is.null(api[[i]]) || is.na(api[[i]]) || api[[i]]=='')
     {
       # Pull from knit with params if that exists
@@ -104,6 +117,10 @@ loadFromRedcap <- function(variables,
       {
         api[[i]] <- getPass::getPass(msg=paste("Please enter RedCap API_KEY for", i))
       }
+      if(!is.null(keyring))
+      {
+        key_set_with_value("rccola", i, api[[i]], keyring)
+      }
     }
 
     tryCatch(
@@ -111,6 +128,7 @@ loadFromRedcap <- function(variables,
       error = function(e)
       {
         rm(i, envir = api)
+        if(!is.null(keyring)) key_delete("rccola", i, keyring)
         stop(e)
       }
     )
