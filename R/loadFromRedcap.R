@@ -25,6 +25,14 @@ readRC <- function(url, key, ...)
   redcapAPI::exportRecords(redcapAPI::redcapConnection(url=url, token=key), ...)
 }
 
+key_saved <- function(envir, key)
+{
+  exists(key, envir=envir, inherits=FALSE) &&
+  !is.null(envir[[key]])                   &&
+  !is.na(api[[key]])                       &&
+  !api[[key]]==''
+}
+
 #' Load data requested into current environment from RedCap
 #'
 #' The first thing it does is check for a yaml config file of
@@ -84,7 +92,7 @@ loadFromRedcap <- function(variables,
 
     tryCatch(
       for(i in variables)
-        assign(i, readRC(config$apiURL, config$apiKeys[[i]], ...), envir=dest),
+        assign(i, readRC(config$apiURL, config$apiKeys[[i]],...), envir=dest),
       error=function(e) stop(e)
     )
 
@@ -92,7 +100,7 @@ loadFromRedcap <- function(variables,
   }
 
   # Create an environment to house API_KEYS locally
-  if(!exists("api")) api <- new.env()
+  if(!exists("apiKeyStore", inherits=FALSE)) apiKeyStore <- new.env()
 
   # Create keyring if it doesn't exist
   if(!is.null(keyring) &&
@@ -108,39 +116,39 @@ loadFromRedcap <- function(variables,
     # If the API_KEY doesn't exist go look for it
 
     # Does it exist in a secret keyring, use that
-    if(!exists(i, envir=api, inherits=FALSE) || is.null(api[[i]]) || is.na(api[[i]]) || api[[i]]=='')
+    if(!key_saved(apiKeyStore, i))
     {
       if(!is.null(keyring) &&
          keyring %in% (keyring::keyring_list()[,1]) &&
          i %in% keyring::key_list("rccola", keyring))
       {
-        api[[i]] <- keyring::key_get("rccola", i, keyring)
+        apiKeyStore[[i]] <- keyring::key_get("rccola", i, keyring)
       }
     }
     # Check again if it's set properly
-    if(!exists(i, envir=api, inherits=FALSE) || is.null(api[[i]]) || is.na(api[[i]]) || api[[i]]=='')
+    if(!key_saved(apiKeyStore, i))
     {
       # Pull from knit with params if that exists
       if(exists("params") && !is.null(params[[i]]) && params[[i]] != "")
       {
         # Pull from Rmarkdown parameters
-        api[[i]] <- params[[i]]
+        apiKeyStore[[i]] <- apiKeyStore[[i]]
       } else # Ask the user for it
       {
-        api[[i]] <- getPass::getPass(msg=paste("Please enter RedCap API_KEY for", i))
+        apiKeyStore[[i]] <- getPass::getPass(msg=paste("Please enter RedCap API_KEY for", i))
       }
 
       if(!is.null(keyring))
       {
-        keyring::key_set_with_value("rccola", i, api[[i]], keyring)
+        keyring::key_set_with_value("rccola", i, apiKeyStore[[i]], keyring)
       }
     }
 
     tryCatch(
-      assign(i, readRC(apiUrl, api[[i]]), envir=dest),
+      assign(i, readRC(apiUrl, apiKeyStore[[i]], ...), envir=dest),
       error = function(e)
       {
-        rm(i, envir = api)
+        rm(i, envir = apiKeyStore)
         if(!is.null(keyring)) keyring::key_delete("rccola", i, keyring)
         stop(e)
       }
