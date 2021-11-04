@@ -16,6 +16,6 @@ Description: The handling of an API_KEY (misnomer for password) for protected
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: redcapAPI, getPass, yaml
+Imports: redcapAPI, getPass, yaml, keyring
 URL: https://github.com/spgarbet/rccola
 RoxygenNote: 7.1.2
