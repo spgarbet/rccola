@@ -2,6 +2,11 @@
 
 export(loadFromRedcap)
 importFrom(getPass,getPass)
+importFrom(keyring,key_get)
+importFrom(keyring,key_list)
+importFrom(keyring,key_set_with_value)
+importFrom(keyring,keyring_create)
+importFrom(keyring,keyring_list)
 importFrom(redcapAPI,exportRecords)
 importFrom(redcapAPI,redcapConnection)
 importFrom(yaml,read_yaml)

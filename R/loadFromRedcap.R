@@ -57,6 +57,11 @@ readRC <- function(url, key, ...)
 #'
 #' @importFrom getPass getPass
 #' @importFrom yaml read_yaml
+#' @importFrom keyring key_get
+#' @importFrom keyring key_list
+#' @importFrom keyring key_set_with_value
+#' @importFrom keyring keyring_create
+#' @importFrom keyring keyring_list
 #'
 #' @export
 #'
@@ -86,9 +91,18 @@ loadFromRedcap <- function(variables,
     return(invisible())
   }
 
+  browser()
 
   # Create an environment to house API_KEYS locally
   if(!exists("api")) api <- new.env()
+
+  # Create keyring if it doesn't exist
+  if(!is.null(keyring) &&
+     !(keyring  %in% (keyring::keyring_list()[,1]))
+    )
+  {
+    keyring::keyring_create(keyring)
+  }
 
   # For each dataset requested
   for(i in variables)
@@ -99,10 +113,10 @@ loadFromRedcap <- function(variables,
     if(!exists(i, envir=api, inherits=FALSE) || is.null(api[[i]]) || is.na(api[[i]]) || api[[i]]=='')
     {
       if(!is.null(keyring) &&
-         keyring %in% default_backend()$keyring_list()[,1] &&
-         i %in% key_list("rccola", keyring))
+         keyring %in% (keyring::keyring_list()[,1]) &&
+         i %in% keyring::key_list("rccola", keyring))
       {
-        api[[i]] <- get_key("rccola", i, keyring)
+        api[[i]] <- keyring::key_get("rccola", i, keyring)
       }
     }
     # Check again if it's set properly
@@ -117,9 +131,10 @@ loadFromRedcap <- function(variables,
       {
         api[[i]] <- getPass::getPass(msg=paste("Please enter RedCap API_KEY for", i))
       }
+
       if(!is.null(keyring))
       {
-        key_set_with_value("rccola", i, api[[i]], keyring)
+        keyring::key_set_with_value("rccola", i, api[[i]], keyring)
       }
     }
 
@@ -128,7 +143,7 @@ loadFromRedcap <- function(variables,
       error = function(e)
       {
         rm(i, envir = api)
-        if(!is.null(keyring)) key_delete("rccola", i, keyring)
+        if(!is.null(keyring)) keyring::key_delete("rccola", i, keyring)
         stop(e)
       }
     )
