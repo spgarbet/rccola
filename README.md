@@ -18,7 +18,10 @@ This package "RedCap Cola" provides a simple solution to this problem. It keeps 
 
 ## Installing
 
+    devtools::install_github("spgarbet/keyring")
     devtools::install_github("spgarbet/rccola")
+    
+The keyring package on CRAN is not compatible with knitr/RStudio. I've put in a pull request, the version in my personal github account works with RStudio.
 
 ## How it works. 
 

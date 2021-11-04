@@ -74,7 +74,7 @@ loadFromRedcap <- function(variables,
   dest <- if(is.null(envir)) globalenv() else envir
 
   # If the data exists, clear from memory
-  for(i in variables) if(exists(i, envir=dest)) rm(i, envir=dest)
+  for(i in variables) if(exists(i, envir=dest, inherits=FALSE)) rm(i, envir=dest)
 
   # Use config if it exists
   config_file <- file.path("..", paste0(split_path(getwd())[1],".yml"))
@@ -90,8 +90,6 @@ loadFromRedcap <- function(variables,
 
     return(invisible())
   }
-
-  browser()
 
   # Create an environment to house API_KEYS locally
   if(!exists("api")) api <- new.env()
