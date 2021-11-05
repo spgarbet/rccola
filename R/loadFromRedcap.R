@@ -25,11 +25,12 @@ readRC <- function(url, key, ...)
   redcapAPI::exportRecords(redcapAPI::redcapConnection(url=url, token=key), ...)
 }
 
+# Check if key is in package environment, aka memory
 key_saved <- function(envir, key)
 {
   exists(key, envir=envir, inherits=FALSE) &&
   !is.null(envir[[key]])                   &&
-  !is.na(envir[[key]])                       &&
+  !is.na(envir[[key]])                     &&
   !envir[[key]]==''
 }
 
@@ -57,6 +58,8 @@ key_saved <- function(envir, key)
 #' @param apiUrl The api interface to the RedCap instance to use. defaults to the Vanderbilt instance.
 #' @param envir The target environment for the data. Defaults to .Global
 #' @param keyring Potential keyring, not used by default.
+#' @param forms A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
+#'              The output variable is now the <variable>.<form>
 #' @param \dots Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.
 #' @return Nothing
 #'
@@ -76,13 +79,28 @@ key_saved <- function(envir, key)
 loadFromRedcap <- function(variables,
                            apiUrl="https://redcap.vanderbilt.edu/api/",
                            envir=NULL,
-                           keyring=NULL, ...)
+                           keyring=NULL,
+                           forms=NULL,
+                           ...)
 {
   # Use the global environment for variable storage unless one was specified
   dest <- if(is.null(envir)) globalenv() else envir
 
   # If the data exists, clear from memory
-  for(i in variables) if(exists(i, envir=dest, inherits=FALSE)) rm(i, envir=dest)
+  for(i in variables)
+  {
+    if(is.null(forms) || !(i %in% names(forms)))
+    {
+      if(exists(i, envir=dest, inherits=FALSE)) rm(i, envir=dest)
+    } else
+    {
+      for(j in forms[[i]])
+      {
+        v <- paste0(i, ".", j)
+        if(exists(v, envir=dest, inherits=FALSE)) rm(list=v, envir=dest)
+      }
+    }
+  }
 
   # Use config if it exists
   config_file <- file.path("..", paste0(split_path(getwd())[1],".yml"))
@@ -92,13 +110,23 @@ loadFromRedcap <- function(variables,
 
     tryCatch(
       for(i in variables)
-        assign(i, readRC(config$apiURL, config$apiKeys[[i]],...), envir=dest),
+      {
+        if(is.null(forms) || !(i %in% names(forms)))
+        {
+          assign(i, readRC(config$apiURL, config$apiKeys[[i]],...), envir=dest)
+        } else
+        {
+          for(j in forms[[i]])
+          {
+            assign(paste0(i,".",j), readRC(config$apiURL, config$apiKeys[[i]],forms=j...), envir=dest)
+          }
+        }
+      },
       error=function(e) stop(e)
     )
 
     return(invisible())
   }
-  browser()
 
   # Create an environment to house API_KEYS locally
   if(!exists("apiKeyStore", inherits=FALSE)) apiKeyStore <- new.env()
@@ -146,11 +174,23 @@ loadFromRedcap <- function(variables,
     }
 
     tryCatch(
-      assign(i, readRC(apiUrl, apiKeyStore[[i]], ...), envir=dest),
+      if(is.null(forms) || !(i %in% names(forms)))
+      {
+        assign(i, readRC(apiUrl, apiKeyStore[[i]],...), envir=dest)
+      } else
+      {
+        for(j in forms[[i]])
+        {
+          assign(paste0(i,".",j), readRC(apiUrl, apiKeyStore[[i]],forms=j,...), envir=dest)
+        }
+      },
       error = function(e)
       {
-        rm(i, envir = apiKeyStore)
-        if(!is.null(keyring)) keyring::key_delete("rccola", i, keyring)
+        if(substr(e$message, 1, 3) == "403")
+        {
+          rm(i, envir = apiKeyStore)
+          if(!is.null(keyring)) keyring::key_delete("rccola", i, keyring)
+        }
         stop(e)
       }
     )

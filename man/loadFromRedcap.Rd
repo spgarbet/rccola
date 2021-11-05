@@ -9,6 +9,7 @@ loadFromRedcap(
   apiUrl = "https://redcap.vanderbilt.edu/api/",
   envir = NULL,
   keyring = NULL,
+  forms = NULL,
   ...
 )
 }
@@ -20,6 +21,9 @@ loadFromRedcap(
 \item{envir}{The target environment for the data. Defaults to .Global}
 
 \item{keyring}{Potential keyring, not used by default.}
+
+\item{forms}{A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
+The output variable is now the <variable>.<form>}
 
 \item{\dots}{Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.}
 }
