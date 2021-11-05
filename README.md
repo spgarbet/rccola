@@ -61,10 +61,27 @@ For local knitting from RStudio, the header of the file should look something li
     
 The document can now be knitted with `Knit -> Knit with Parameters`. It also works when running chunks from the console. Two variables are now sitting in memory `intake` and `details` with the contents of those two RedCap repositories.
 
+
 ## Keyring Storage
 
-See the [keyring](https://github.com/r-lib/keyring) github page for details on configuring your keyring storage to use a prefered service if you desire.
+Using a keyring removes the need to knit with parameters, and the keys are store in local encrypted storage.
 
-The "service" used is "rccola". The keyring created by this package will be whatever string you pass. Thus API_KEYs could be shared between reports as well via using the same keyring. However, since they are keyed via their variable names--if one used a single keyring for all each RedCap database would need a distinct variable name that would be consistent across projects. Otherwise, there would be a namespace collision and it would ask for the API_KEY each time projects were switched.
+See the [keyring](https://github.com/r-lib/keyring) github page for details on configuring your keyring storage to use a preferred service if you desire. It will default to a password protected encrypted user file.
 
-    
+The "service" used for all keyrings is "rccola". The keyring created by this package will be whatever string you pass as the `keyring=`. Thus API_KEYs could be shared between reports as well via using the same keyring. However, since they are keyed via their variable names--if one used a single keyring for all each RedCap database would need a distinct variable name that would be consistent across projects. Otherwise, there could be a namespace collision and it could load the wrong database into a variable. Be very careful with naming when using a shared keyring between projects. 
+
+If you wish to delete the keys stored in the keyring, simply: `keyring::keyring_delete("name_of_keyring")`.
+
+## Forms option
+
+One can load forms from a database. Continuing the above example let's imagine that the `intake` project has two forms: `consent` and `randomization`.
+
+    loadFromRedcap(c("intake", "details"),
+                   keyring="myreportname",
+                   forms=list("intake" => c("consent", "randomization")))
+                   
+The resulting variables in memory are
+
+  * intake.consent
+  * intake.randomization
+  * details
