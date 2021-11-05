@@ -7,8 +7,14 @@
 readRC(key, ...)
 }
 \arguments{
-\item{key}{the api key of interest}
+\item{key}{the api key of interest. The package provides this.}
+
+\item{...}{Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.}
 }
 \description{
 Default function to read from redcap
+}
+\examples{
+\donttest{data <- readRC(keyring::key_get("rccola", "database_name", "project_name"))}
+
 }

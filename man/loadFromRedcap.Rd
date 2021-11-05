@@ -23,10 +23,10 @@ loadFromRedcap(
 \item{forms}{A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
 The output variable is now the <variable>.<form>}
 
-\item{FUN}{the function to call. It must have a key argument. If forms are used it should have a form argument as well.
-The default is to call readRC.}
+\item{FUN}{the function to call. It must have a key argument. If forms are used it should have a forms argument as well.
+The default is to call readRC which is a shim for \code{\link[redcapAPI]{exportRecords}}..}
 
-\item{\dots}{Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.}
+\item{\dots}{Additional arguments passed to FUN.}
 }
 \value{
 Nothing
@@ -52,6 +52,6 @@ as this is the equivalent of writing the API_KEY to a local
 file in clear text.
 }
 \examples{
-\donttest{loadFromRedcap(data)}
+\donttest{readRC(keyring::get_key()}
 
 }

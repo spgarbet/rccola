@@ -1,5 +1,6 @@
-# rccola load data from RedCap, keep API_KEYs safe
-# Copyright (C) 2021 Shawn Garbett
+# rccola load data from RedCap while keeping API_KEYs safe
+#
+# Copyright (C) 2021 Shawn Garbett, Cole Beck, Hui Wu
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,22 +15,36 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-split_path <- function(path) {
-    rev(setdiff(strsplit(path,"/|\\\\")[[1]], ""))
-}
+  #############################################################################
+ ##
+## The default read from RedCap function
 
 #' Default function to read from redcap
 #'
-#' @param key the api key of interest
+#' @param key the api key of interest. The package provides this.
+#' @param ... Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.
 #'
 #' @importFrom redcapAPI redcapConnection
 #' @importFrom redcapAPI exportRecords
+#'
+#' @examples
+#' \donttest{data <- readRC(keyring::key_get("rccola", "database_name", "project_name"))}
 #'
 #' @export
 readRC <- function(key, ...)
 {
   args <- list(...)
   redcapAPI::exportRecords(redcapAPI::redcapConnection(url=args[["url"]],token=key), ...)
+}
+
+
+  #############################################################################
+ ##
+## Helper Functions
+
+# Split paths into vector of strings
+split_path <- function(path) {
+    rev(setdiff(strsplit(path,"/|\\\\")[[1]], ""))
 }
 
 # Check if key is in package environment, aka memory
@@ -40,6 +55,10 @@ key_saved <- function(envir, key)
   !is.na(envir[[key]])                     &&
   !envir[[key]]==''
 }
+
+  #############################################################################
+ ##
+## The main function
 
 #' Load data requested into current environment from RedCap
 #'
@@ -67,12 +86,12 @@ key_saved <- function(envir, key)
 #' @param forms A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
 #'              The output variable is now the <variable>.<form>
 #' @param FUN the function to call. It must have a key argument. If forms are used it should have a forms argument as well.
-#'              The default is to call readRC.
-#' @param \dots Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.
+#'              The default is to call readRC which is a shim for \code{\link[redcapAPI]{exportRecords}}..
+#' @param \dots Additional arguments passed to FUN.
 #' @return Nothing
 #'
 #' @examples
-#' \donttest{loadFromRedcap(data)}
+#' \donttest{readRC(keyring::get_key()}
 #'
 #' @importFrom getPass getPass
 #' @importFrom yaml read_yaml
@@ -115,18 +134,23 @@ loadFromRedcap <- function(variables,
   if(file.exists(config_file))
   {
     config <- read_yaml(config_file)
+    config <- config$rccola
+    keys   <- config$keys
+    args   <- c(config$args, list(...))
 
     tryCatch(
       for(i in variables)
       {
+        args$key  <- keys[[i]]
+        args$form <- NULL
         if(is.null(forms) || !(i %in% names(forms)))
         {
-          assign(i, FUN(url=config$apiURL, config$apiKeys[[i]],...), envir=dest)
+          assign(i, do.call(FUN, args), envir=dest)
         } else
         {
           for(j in forms[[i]])
           {
-            assign(paste0(i,".",j), FUN(url=config$apiURL, config$apiKeys[[i]],forms=j...), envir=dest)
+            assign(paste0(i,".",j), do.call(FUN, args), envir=dest)
           }
         }
       },
