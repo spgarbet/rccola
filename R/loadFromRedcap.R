@@ -18,11 +18,18 @@ split_path <- function(path) {
     rev(setdiff(strsplit(path,"/|\\\\")[[1]], ""))
 }
 
+#' Default function to read from redcap
+#'
+#' @param key the api key of interest
+#'
 #' @importFrom redcapAPI redcapConnection
 #' @importFrom redcapAPI exportRecords
-readRC <- function(url, key, ...)
+#'
+#' @export
+readRC <- function(key, ...)
 {
-  redcapAPI::exportRecords(redcapAPI::redcapConnection(url=url, token=key), ...)
+  args <- list(...)
+  redcapAPI::exportRecords(redcapAPI::redcapConnection(url=args[["url"]],token=key), ...)
 }
 
 # Check if key is in package environment, aka memory
@@ -55,11 +62,12 @@ key_saved <- function(envir, key)
 #' file in clear text.
 #'
 #' @param variables A list of strings that define the variables to fill with RedCap data
-#' @param apiUrl The api interface to the RedCap instance to use. defaults to the Vanderbilt instance.
 #' @param envir The target environment for the data. Defaults to .Global
 #' @param keyring Potential keyring, not used by default.
 #' @param forms A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
 #'              The output variable is now the <variable>.<form>
+#' @param FUN the function to call. It must have a key argument. If forms are used it should have a forms argument as well.
+#'              The default is to call readRC.
 #' @param \dots Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.
 #' @return Nothing
 #'
@@ -77,10 +85,10 @@ key_saved <- function(envir, key)
 #' @export
 #'
 loadFromRedcap <- function(variables,
-                           apiUrl="https://redcap.vanderbilt.edu/api/",
                            envir=NULL,
                            keyring=NULL,
                            forms=NULL,
+                           FUN=readRC,
                            ...)
 {
   # Use the global environment for variable storage unless one was specified
@@ -113,12 +121,12 @@ loadFromRedcap <- function(variables,
       {
         if(is.null(forms) || !(i %in% names(forms)))
         {
-          assign(i, readRC(config$apiURL, config$apiKeys[[i]],...), envir=dest)
+          assign(i, FUN(url=config$apiURL, config$apiKeys[[i]],...), envir=dest)
         } else
         {
           for(j in forms[[i]])
           {
-            assign(paste0(i,".",j), readRC(config$apiURL, config$apiKeys[[i]],forms=j...), envir=dest)
+            assign(paste0(i,".",j), FUN(url=config$apiURL, config$apiKeys[[i]],forms=j...), envir=dest)
           }
         }
       },
@@ -176,12 +184,12 @@ loadFromRedcap <- function(variables,
     tryCatch(
       if(is.null(forms) || !(i %in% names(forms)))
       {
-        assign(i, readRC(apiUrl, apiKeyStore[[i]],...), envir=dest)
+        assign(i, FUN(apiKeyStore[[i]],...), envir=dest)
       } else
       {
         for(j in forms[[i]])
         {
-          assign(paste0(i,".",j), readRC(apiUrl, apiKeyStore[[i]],forms=j,...), envir=dest)
+          assign(paste0(i,".",j), FUN(apiKeyStore[[i]],forms=j,...), envir=dest)
         }
       },
       error = function(e)

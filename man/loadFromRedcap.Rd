@@ -6,17 +6,15 @@
 \usage{
 loadFromRedcap(
   variables,
-  apiUrl = "https://redcap.vanderbilt.edu/api/",
   envir = NULL,
   keyring = NULL,
   forms = NULL,
+  FUN = readRC,
   ...
 )
 }
 \arguments{
 \item{variables}{A list of strings that define the variables to fill with RedCap data}
-
-\item{apiUrl}{The api interface to the RedCap instance to use. defaults to the Vanderbilt instance.}
 
 \item{envir}{The target environment for the data. Defaults to .Global}
 
@@ -24,6 +22,9 @@ loadFromRedcap(
 
 \item{forms}{A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
 The output variable is now the <variable>.<form>}
+
+\item{FUN}{the function to call. It must have a key argument. If forms are used it should have a form argument as well.
+The default is to call readRC.}
 
 \item{\dots}{Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.}
 }
