@@ -42,11 +42,6 @@ readRC <- function(key, ...)
  ##
 ## Helper Functions
 
-# Split paths into vector of strings
-split_path <- function(path) {
-    rev(setdiff(strsplit(path,"/|\\\\")[[1]], ""))
-}
-
 # Check if key is in package environment, aka memory
 key_saved <- function(envir, key)
 {
@@ -130,7 +125,7 @@ loadFromRedcap <- function(variables,
   }
 
   # Use config if it exists
-  config_file <- file.path("..", paste0(split_path(getwd())[1],".yml"))
+  config_file <- file.path("..", paste0(basename(getwd()),".yml"))
   if(file.exists(config_file))
   {
     config <- read_yaml(config_file)
