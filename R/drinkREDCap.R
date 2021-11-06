@@ -113,7 +113,7 @@ drinkREDCap    <- function(variables,
   # Use the global environment for variable storage unless one was specified
   dest <- if(is.null(envir)) globalenv() else envir
 
-  # If the data exists, clear from memory
+  # If the variable exists, clear from memory
   for(i in variables)
   {
     if(is.null(forms) || !(i %in% names(forms)))
