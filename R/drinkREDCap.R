@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# For pulling from knit with parameters
+globalVariables("params")
+
   #############################################################################
  ##
 ## The default read from REDCap function
@@ -27,7 +30,7 @@
 #' @importFrom redcapAPI exportRecords
 #'
 #' @examples
-#' \donttest{data <- sipREDCap(keyring::key_get("rccola", "database_name", "project_name"))}
+#' \dontrun{data <- sipREDCap(keyring::key_get("rccola", "database_name", "project_name"))}
 #'
 #' @export
 sipREDCap <- function(key, ...)
@@ -89,7 +92,9 @@ key_saved <- function(envir, key)
 #' @return Nothing
 #'
 #' @examples
-#' \donttest{drinkREDCap("database", "myproject")}
+#' \dontrun{
+#'   drinkREDCap("database", "myproject")
+#' }
 #'
 #' @importFrom getPass getPass
 #' @importFrom yaml read_yaml
@@ -103,8 +108,8 @@ key_saved <- function(envir, key)
 #' @export
 #'
 drinkREDCap    <- function(variables,
-                           envir     = NULL,
                            keyring   = NULL,
+                           envir     = NULL,
                            forms     = NULL,
                            FUN       = sipREDCap,
                            config    = 'auto',
@@ -199,7 +204,7 @@ drinkREDCap    <- function(variables,
       if(exists("params") && !is.null(params[[i]]) && params[[i]] != "")
       {
         # Pull from Rmarkdown parameters
-        apiKeyStore[[i]] <- apiKeyStore[[i]]
+        apiKeyStore[[i]] <- params[[i]]
       } else # Ask the user for it
       {
         apiKeyStore[[i]] <- getPass::getPass(msg=paste("Please enter RedCap API_KEY for", i))

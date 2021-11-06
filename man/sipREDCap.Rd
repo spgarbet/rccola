@@ -15,6 +15,6 @@ sipREDCap(key, ...)
 Default function to read from REDCap
 }
 \examples{
-\donttest{data <- sipREDCap(keyring::key_get("rccola", "database_name", "project_name"))}
+\dontrun{data <- sipREDCap(keyring::key_get("rccola", "database_name", "project_name"))}
 
 }

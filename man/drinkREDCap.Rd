@@ -8,8 +8,8 @@ data into memory.}
 \usage{
 drinkREDCap(
   variables,
-  envir = NULL,
   keyring = NULL,
+  envir = NULL,
   forms = NULL,
   FUN = sipREDCap,
   config = "auto",
@@ -18,8 +18,8 @@ drinkREDCap(
 
 loadFromRedcap(
   variables,
-  envir = NULL,
   keyring = NULL,
+  envir = NULL,
   forms = NULL,
   FUN = sipREDCap,
   config = "auto",
@@ -29,9 +29,9 @@ loadFromRedcap(
 \arguments{
 \item{variables}{character vector. A list of strings that define the variables with associated API_KEYs to load into memory.}
 
-\item{envir}{environment. The target environment for the data. Defaults to .Global}
-
 \item{keyring}{character. Potential keyring, not used by default.}
+
+\item{envir}{environment. The target environment for the data. Defaults to .Global}
 
 \item{forms}{list. A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
 The output variable is now the <variable>.<form>}
@@ -69,6 +69,8 @@ file in clear text.
 An older loadFromRedcap function maps to this for backward compatibility.
 }
 \examples{
-\donttest{drinkREDCap("database", "myproject")}
+\dontrun{
+  drinkREDCap("database", "myproject")
+}
 
 }

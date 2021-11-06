@@ -1,7 +1,7 @@
 Package: rccola
 Type: Package
 Title: Safely Manage API_KEYS and load data from source such as RedCap
-Version: 0.1.10
+Version: 0.1.11
 Authors@R: c(person("Shawn",    "Garbett",  email = "Shawn.Garbett@vumc.org",        role = c("aut", "cre")),
              person("Hui",      "Wu",       email = "Hui.Wu@vumc.org",               role = c("aut")),
              person("Cole",     "Beck",     email = "Cole.Beck@vumc.org",            role = c("aut"))
@@ -14,7 +14,7 @@ Description: The handling of an API_KEY (misnomer for password) for protected
     data can be difficult. This package provides secure convenience functions for 
     entering / handling API_KEYs and pulling data directly into memory. By default
     it will load from REDCap instances.
-License: GPL-3
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: redcapAPI, getPass, yaml, keyring
