@@ -9,7 +9,7 @@ Authors@R: c(person("Shawn",    "Garbett",  email = "Shawn.Garbett@vumc.org",   
 Author: Shawn Garbett [aut, cre],
   Hui Wu [aut],
   Cole Beck [aut]
-Maintainer: Shawn Garbett <Shawn.Garbett@vumc.org>
+Maintainer: Shawn Garbett <Shawn@Garbett.org>
 Description: The handling of an API_KEY (misnomer for password) for protected
     data can be difficult. This package provides secure convenience functions for 
     entering / handling API_KEYs and pulling data directly into memory. By default
