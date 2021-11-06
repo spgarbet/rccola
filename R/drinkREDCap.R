@@ -1,4 +1,4 @@
-# rccola load data from RedCap while keeping API_KEYs safe
+# rccola load data from REDCap while keeping API_KEYs safe
 #
 # Copyright (C) 2021 Shawn Garbett, Cole Beck, Hui Wu
 #
