@@ -124,3 +124,24 @@ Let's say we have the above examples and wish to use a curl method.
 
 This calls the user defined function rcurl_load and places in user space three
 variables: `intake.consent`, `intake.randomization`, and `details`. 
+## Production Environments
+
+For automated processes the API_KEYS in a file are generally required. These automated servers are usually security hardened with 
+very tightly controlled access. To facilitate the smooth transition
+to a production environment, the `config` option can be used to specify a configuration file with the keys. If `config` is set to 
+'auto', the default, then it takes the name of the current directory and looks above it for a file of the same name with a ".yml" extension as the config file. If `config` is set to NULL this override behavior is not followed. If the config file does 
+not exist it prompts the user as usual.
+
+An example yaml configuration file would look something like the following:
+
+    other-config-stuff1: blah blah
+    rccola:
+      args:
+        url: https://redcap.vanderbilt.edu/api/
+      keys:
+        intake: THIS_IS_THE_INTAKE_DATABASE_APIKEY
+        details: THIS_IS_THE_DETAILS_DATABASE_APIKEY
+    other-config-stuff2: blah blah
+    other-config-stuff3: blah blah
+    ...
+    
