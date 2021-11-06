@@ -37,7 +37,7 @@ loadFromRedcap(
 The output variable is now the <variable>.<form>}
 
 \item{FUN}{function. the function to call. It must have a key argument. If forms are used it should have a forms argument as well.
-The default is to call readRC which is a shim for \code{\link[redcapAPI]{exportRecords}}.}
+The default is to call sipREDCap which is a proxy for \code{\link[redcapAPI]{exportRecords}}.}
 
 \item{config}{string. Defaults to 'auto'. If set to NULL no configuration file is searched for. If set to anything
 but 'auto', that will be the config file override that is used if it exists instead of

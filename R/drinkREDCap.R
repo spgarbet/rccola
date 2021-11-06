@@ -81,7 +81,7 @@ key_saved <- function(envir, key)
 #' @param forms list. A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
 #'              The output variable is now the <variable>.<form>
 #' @param FUN function. the function to call. It must have a key argument. If forms are used it should have a forms argument as well.
-#'              The default is to call readRC which is a shim for \code{\link[redcapAPI]{exportRecords}}.
+#'              The default is to call sipREDCap which is a proxy for \code{\link[redcapAPI]{exportRecords}}.
 #' @param config string. Defaults to 'auto'. If set to NULL no configuration file is searched for. If set to anything
 #'              but 'auto', that will be the config file override that is used if it exists instead of
 #'              searching for the ../<basename>.yml.
