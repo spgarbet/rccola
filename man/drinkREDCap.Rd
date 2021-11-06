@@ -3,14 +3,15 @@
 \name{drinkREDCap}
 \alias{drinkREDCap}
 \alias{loadFromRedcap}
-\title{Load data requested into current environment from RedCap}
+\title{Provide API_KEYs to function (defaults to load from REDCap) and load
+data into memory.}
 \usage{
 drinkREDCap(
   variables,
   envir = NULL,
   keyring = NULL,
   forms = NULL,
-  FUN = sipRedCap,
+  FUN = sipREDCap,
   config = "auto",
   ...
 )
@@ -20,13 +21,13 @@ loadFromRedcap(
   envir = NULL,
   keyring = NULL,
   forms = NULL,
-  FUN = sipRedCap,
+  FUN = sipREDCap,
   config = "auto",
   ...
 )
 }
 \arguments{
-\item{variables}{character vector. A list of strings that define the variables to fill with RedCap data}
+\item{variables}{character vector. A list of strings that define the variables with associated API_KEYs to load into memory.}
 
 \item{envir}{environment. The target environment for the data. Defaults to .Global}
 
@@ -53,21 +54,21 @@ the same name as the current directory with a .yml extension
 one level above. This is intended for production environments
 where the API_KEY must be stored in a file. If this yaml exists, then it expects this file
 to contain `apiUrl` and `apiKeys`. `apiUrl` should be a
-string with the URL of the Redcap instance. `apiKeys` should
+string with the URL of the REDCap instance. `apiKeys` should
 be a list of variable name keys with values that are their
-actual RedCap API_KEY.
-}
-\details{
+actual REDCap API_KEY. \cr\cr
 Next it will use an api environment in memory to keep api_keys.
 If one is knitting with parameters, it will request and store these
 keys in memory. Otherwise it will request the user enter
-each key using getPass and store it in memory.
-
+each key using getPass and store it in memory.\cr\cr
 IMPORTANT: Make sure that R is set to NEVER save workspace to .RData
 as this is the equivalent of writing the API_KEY to a local
 file in clear text.
 }
+\details{
+An older loadFromRedcap function maps to this for backward compatibility.
+}
 \examples{
-\donttest{readRC(keyring::get_key()}
+\donttest{drinkREDCap("database", "myproject")}
 
 }

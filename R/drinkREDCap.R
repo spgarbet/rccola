@@ -18,7 +18,6 @@
   #############################################################################
  ##
 ## The default read from REDCap function
-
 #' Default function to read from REDCap
 #'
 #' @param key the api key of interest. The package provides this.
@@ -28,7 +27,7 @@
 #' @importFrom redcapAPI exportRecords
 #'
 #' @examples
-#' \donttest{data <- readRC(keyring::key_get("rccola", "database_name", "project_name"))}
+#' \donttest{data <- sipREDCap(keyring::key_get("rccola", "database_name", "project_name"))}
 #'
 #' @export
 sipREDCap <- function(key, ...)
@@ -41,8 +40,8 @@ sipREDCap <- function(key, ...)
   #############################################################################
  ##
 ## Helper Functions
-
-# Check if key is in package environment, aka memory
+##
+## Check if key is in package environment, aka memory
 key_saved <- function(envir, key)
 {
   exists(key, envir=envir, inherits=FALSE) &&
@@ -54,28 +53,29 @@ key_saved <- function(envir, key)
   #############################################################################
  ##
 ## The main function
-
-#' Load data requested into current environment from RedCap
+##
+#' Provide API_KEYs to function (defaults to load from REDCap) and load
+#' data into memory.
 #'
 #' The first thing it does is check for a yaml config file of
 #' the same name as the current directory with a .yml extension
 #' one level above. This is intended for production environments
 #' where the API_KEY must be stored in a file. If this yaml exists, then it expects this file
 #' to contain `apiUrl` and `apiKeys`. `apiUrl` should be a
-#' string with the URL of the Redcap instance. `apiKeys` should
+#' string with the URL of the REDCap instance. `apiKeys` should
 #' be a list of variable name keys with values that are their
-#' actual RedCap API_KEY.
-#'
+#' actual REDCap API_KEY. \cr\cr
 #' Next it will use an api environment in memory to keep api_keys.
 #' If one is knitting with parameters, it will request and store these
 #' keys in memory. Otherwise it will request the user enter
-#' each key using getPass and store it in memory.
-#'
+#' each key using getPass and store it in memory.\cr\cr
 #' IMPORTANT: Make sure that R is set to NEVER save workspace to .RData
 #' as this is the equivalent of writing the API_KEY to a local
 #' file in clear text.
 #'
-#' @param variables character vector. A list of strings that define the variables to fill with RedCap data
+#' An older loadFromRedcap function maps to this for backward compatibility.
+#'
+#' @param variables character vector. A list of strings that define the variables with associated API_KEYs to load into memory.
 #' @param envir environment. The target environment for the data. Defaults to .Global
 #' @param keyring character. Potential keyring, not used by default.
 #' @param forms list. A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
@@ -89,7 +89,7 @@ key_saved <- function(envir, key)
 #' @return Nothing
 #'
 #' @examples
-#' \donttest{readRC(keyring::get_key()}
+#' \donttest{drinkREDCap("database", "myproject")}
 #'
 #' @importFrom getPass getPass
 #' @importFrom yaml read_yaml
@@ -103,11 +103,11 @@ key_saved <- function(envir, key)
 #' @export
 #'
 drinkREDCap    <- function(variables,
-                           envir=NULL,
-                           keyring=NULL,
-                           forms=NULL,
-                           FUN=sipRedCap,
-                           config='auto',
+                           envir     = NULL,
+                           keyring   = NULL,
+                           forms     = NULL,
+                           FUN       = sipREDCap,
+                           config    = 'auto',
                            ...)
 {
   # Use the global environment for variable storage unless one was specified
