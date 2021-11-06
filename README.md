@@ -1,10 +1,10 @@
-# RCCola
+# RedCap CryptO Locker for Api_keys (rccola)
 
-A project to assist in the management of API_KEYS to pull RedCap data in a safe manner.
+A project to assist in the management of API_KEYS to pull REDCap data using secure practices. The interface will work with anything pulling data into a variable that needs an API_KEY kept secure.
 
 ## The Problem
 
-An API_KEY is your username and password rolled into one. This long hexadecimal string provides access into RedCap repositories. If these repositories contain PHI, HIPAA has a $100 per patient record minimum fine. This means the inadvertent leakage of a RedCap API_KEY is *expensive*.
+An API_KEY is your username and password rolled into one. This long hexadecimal string provides access into REDCap repositories. If these repositories contain PHI, HIPAA has a $100 per patient record minimum fine. This means the inadvertent leakage of a REDCap API_KEY can be very *expensive* and result in legal exposure.
 
 The risk of exposure is very high if one simply hard codes the API_KEY into a report. If one is sharing with colleagues, git is commonly used to version code. The moment such code is pushed to a public repository such as [github.com](https://github.com), that API_KEY is now shared with the world, and by proxy potentially all that clinical data. 
 
@@ -14,23 +14,23 @@ Storing in plain text outside the project directory is better, but the problem t
 
 ## The solution
 
-This package "RedCap Cola" provides a simple solution to this problem. It keeps the API_KEY(s) in memory in an R session when working. IMPORTANT: Make sure R is set to *never* save the .RData of the session or your back to yet another plain text save on the local drive. [See r-bloggers](https://www.r-bloggers.com/2017/04/using-r-dont-save-your-workspace/) and [stackoverflow](https://stackoverflow.com/questions/4996090/how-to-disable-save-workspace-image-prompt-in-r). The API_KEY(s) are stored in an encrypted keyring when not working. The system will prompt for the keys initially and save and retrieve as needed downstream. It is also designed to work with a production report server at Vanderbilt Biostatistics that emails reports automatically on a repeating basis, with *no changes* to the report. Thus a party can work in their local environment, save their code to a git report. This git repo can be shared with a system administrator who to update a report simply needs to do a git pull.
+This package `rccola`, **R**ed**C**ap **C**rytp**O** **L**ocker for **A**pi_keys. provides a simple solution to this problem. It keeps the API_KEY(s) in memory in an R session when working. IMPORTANT: Make sure R is set to *never* save the .RData of the session or one is back to yet another plain text password save on the local drive. [See r-bloggers](https://www.r-bloggers.com/2017/04/using-r-dont-save-your-workspace/) and [stackoverflow](https://stackoverflow.com/questions/4996090/how-to-disable-save-workspace-image-prompt-in-r). The API_KEY(s) are stored in an encrypted keyring when not working. The system will prompt for a keyring password initially and the keys. Then it will and save and retrieve as needed later in ones workflow. It is also designed to work with a production report server by allowing a production configuration to override usage of a cryptolocker. Thus the path from a statistician developing a report to a production server requires no code changes.
 
 ## Installing
 
     devtools::install_github("spgarbet/keyring")
     devtools::install_github("spgarbet/rccola")
     
-The keyring package on CRAN is not compatible with knitr/RStudio. I've put in a pull request, the version in my personal github account works with RStudio.
+The keyring package on CRAN is not compatible with knitr/RStudio. I've put in a [pull request](https://github.com/r-lib/keyring/pull/117), the version in my personal github account works with RStudio.
 
-## How it works. 
+## Knit with Parameters option
 
-For the purposes of demonstration, we shall assume that there are two RedCap projects that need to be summarized in a report:
+For the purposes of demonstration, we shall assume that there are two REDCap projects that need to be summarized in a report:
 
   * Intake
   * Details
   
-For local knitting from RStudio, the header of the file should look something like this:
+For local knitting from RStudio if one wishes to use parameters, the header of the file would look  like this:
 
     ---
     title: "A Wonderful Report"
@@ -55,33 +55,72 @@ For local knitting from RStudio, the header of the file should look something li
     
     library(rccola)
     
-    loadFromRedcap(c("intake", "details"), keyring="myreportname")
+    drinkREDCap(c("intake", "details"), keyring="myreportname")
     
     ...
     
 The document can now be knitted with `Knit -> Knit with Parameters`. It also works when running chunks from the console. Two variables are now sitting in memory `intake` and `details` with the contents of those two RedCap repositories.
 
-
 ## Keyring Storage
 
-Using a keyring removes the need to knit with parameters, and the keys are store in local encrypted storage.
+Using a keyring removes the need to knit with parameters and entering the API_KEY with each new session, and the keys are store in local encrypted storage. Only the user specified password
+to the cryptolocker keyring is needed.
 
 See the [keyring](https://github.com/r-lib/keyring) github page for details on configuring your keyring storage to use a preferred service if you desire. It will default to a password protected encrypted user file.
 
-The "service" used for all keyrings is "rccola". The keyring created by this package will be whatever string you pass as the `keyring=`. Thus API_KEYs could be shared between reports as well via using the same keyring. However, since they are keyed via their variable names--if one used a single keyring for all each RedCap database would need a distinct variable name that would be consistent across projects. Otherwise, there could be a namespace collision and it could load the wrong database into a variable. Be very careful with naming when using a shared keyring between projects. 
+The `"service"` used for all keyrings is `"rccola"`. The keyring created by this package will be whatever string you pass as the `keyring=`. Thus API_KEYs could be shared between reports as well via using the same keyring. However, since they are keyed via their variable names--if one used a single keyring for all each RedCap database would need a distinct variable name that would be consistent across projects. Otherwise, there could be a namespace collision and it could load the wrong database into a variable. Be very careful with naming when using a shared keyring between projects. 
 
-If you wish to delete the keys stored in the keyring, simply: `keyring::keyring_delete("name_of_keyring")`.
+If you wish to delete the keys stored in the keyring, simply: `keyring::keyring_delete("your_keyring_name")`.
 
 ## Forms option
 
 One can load forms from a database. Continuing the above example let's imagine that the `intake` project has two forms: `consent` and `randomization`.
 
-    loadFromRedcap(c("intake", "details"),
-                   keyring="myreportname",
-                   forms=list("intake" => c("consent", "randomization")))
+    drinkREDCap(variables           = c("intake", "details"),
+                keyring             = "myreportname",
+                forms=list("intake" = c("consent", "randomization")))
                    
-The resulting variables in memory are
+The resulting variables in memory are, which were pulled from the intake API_KEY and the details API_KEY.
 
   * intake.consent
   * intake.randomization
   * details
+  
+## Inversion of Control
+
+redcapAPI::exportRecord is only the default, anything that needs key management and returns a variable is supported by this library. A function supplied to the `FUN=` argument
+can be of either of these two signatures: `function(key, ...)` or `function(key, forms, ...)` if
+the forms argument is used.
+
+Let's say we have the above examples and wish to use a curl method.
+
+    library(RCurl)
+
+    rcurl_load <- function(key, forms, ...)
+    {
+      data <- postForm(
+        'https://redcap.vanderbilt.edu/api/',
+        token=key,
+        content='record',
+        format='csv',
+        forms=forms,
+        fields=c("record_id"),
+        rawOrLabel='label',
+        exportDataAccessGroups = TRUE
+     )
+     read.csv(file             = textConnection(data),
+              header           = TRUE,
+              sep              = ",",
+              na.strings       = c(".","","NA","na"),
+              stringsAsFactors = FALSE)
+    }
+    
+    drinkREDCap(c("intake", "details"),
+                keyring="myreportname",
+                forms=list(
+                  "intake"  = c("consent", "randomization")
+                )
+                FUN=rcurl_load)
+
+This calls the user defined function rcurl_load and places in user space three
+variables: `intake.consent`, `intake.randomization`, and `details`. 

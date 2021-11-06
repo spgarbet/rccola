@@ -17,9 +17,9 @@
 
   #############################################################################
  ##
-## The default read from RedCap function
+## The default read from REDCap function
 
-#' Default function to read from redcap
+#' Default function to read from REDCap
 #'
 #' @param key the api key of interest. The package provides this.
 #' @param ... Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.
@@ -31,7 +31,7 @@
 #' \donttest{data <- readRC(keyring::key_get("rccola", "database_name", "project_name"))}
 #'
 #' @export
-readRC <- function(key, ...)
+sipREDCap <- function(key, ...)
 {
   args <- list(...)
   redcapAPI::exportRecords(redcapAPI::redcapConnection(url=args[["url"]],token=key), ...)
@@ -96,13 +96,14 @@ key_saved <- function(envir, key)
 #' @importFrom keyring keyring_create
 #' @importFrom keyring keyring_list
 #'
+#' @rdname drinkREDCap
 #' @export
 #'
-loadFromRedcap <- function(variables,
+drinkREDCap    <- function(variables,
                            envir=NULL,
                            keyring=NULL,
                            forms=NULL,
-                           FUN=readRC,
+                           FUN=sipRedCap,
                            ...)
 {
   # Use the global environment for variable storage unless one was specified
@@ -224,3 +225,7 @@ loadFromRedcap <- function(variables,
   }
   return(invisible())
 }
+
+#' @rdname drinkREDCap
+#' @export
+loadFromRedcap <- drinkREDCap
