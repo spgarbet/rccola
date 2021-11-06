@@ -75,13 +75,16 @@ key_saved <- function(envir, key)
 #' as this is the equivalent of writing the API_KEY to a local
 #' file in clear text.
 #'
-#' @param variables A list of strings that define the variables to fill with RedCap data
-#' @param envir The target environment for the data. Defaults to .Global
-#' @param keyring Potential keyring, not used by default.
-#' @param forms A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
+#' @param variables character vector. A list of strings that define the variables to fill with RedCap data
+#' @param envir environment. The target environment for the data. Defaults to .Global
+#' @param keyring character. Potential keyring, not used by default.
+#' @param forms list. A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
 #'              The output variable is now the <variable>.<form>
-#' @param FUN the function to call. It must have a key argument. If forms are used it should have a forms argument as well.
-#'              The default is to call readRC which is a shim for \code{\link[redcapAPI]{exportRecords}}..
+#' @param FUN function. the function to call. It must have a key argument. If forms are used it should have a forms argument as well.
+#'              The default is to call readRC which is a shim for \code{\link[redcapAPI]{exportRecords}}.
+#' @param config string. Defaults to 'auto'. If set to NULL no configuration file is searched for. If set to anything
+#'              but 'auto', that will be the config file override that is used if it exists instead of
+#'              searching for the ../<basename>.yml.
 #' @param \dots Additional arguments passed to FUN.
 #' @return Nothing
 #'
@@ -104,6 +107,7 @@ drinkREDCap    <- function(variables,
                            keyring=NULL,
                            forms=NULL,
                            FUN=sipRedCap,
+                           config='auto',
                            ...)
 {
   # Use the global environment for variable storage unless one was specified
@@ -126,8 +130,14 @@ drinkREDCap    <- function(variables,
   }
 
   # Use config if it exists
-  config_file <- file.path("..", paste0(basename(getwd()),".yml"))
-  if(file.exists(config_file))
+  config_file <- if(config == 'auto')
+  {
+    file.path("..", paste0(basename(getwd()),".yml"))
+  } else
+  {
+    config
+  }
+  if(!is.null(config_file) && file.exists(config_file))
   {
     config <- read_yaml(config_file)
     config <- config$rccola

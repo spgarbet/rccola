@@ -11,6 +11,7 @@ drinkREDCap(
   keyring = NULL,
   forms = NULL,
   FUN = sipRedCap,
+  config = "auto",
   ...
 )
 
@@ -20,21 +21,26 @@ loadFromRedcap(
   keyring = NULL,
   forms = NULL,
   FUN = sipRedCap,
+  config = "auto",
   ...
 )
 }
 \arguments{
-\item{variables}{A list of strings that define the variables to fill with RedCap data}
+\item{variables}{character vector. A list of strings that define the variables to fill with RedCap data}
 
-\item{envir}{The target environment for the data. Defaults to .Global}
+\item{envir}{environment. The target environment for the data. Defaults to .Global}
 
-\item{keyring}{Potential keyring, not used by default.}
+\item{keyring}{character. Potential keyring, not used by default.}
 
-\item{forms}{A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
+\item{forms}{list. A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
 The output variable is now the <variable>.<form>}
 
-\item{FUN}{the function to call. It must have a key argument. If forms are used it should have a forms argument as well.
-The default is to call readRC which is a shim for \code{\link[redcapAPI]{exportRecords}}..}
+\item{FUN}{function. the function to call. It must have a key argument. If forms are used it should have a forms argument as well.
+The default is to call readRC which is a shim for \code{\link[redcapAPI]{exportRecords}}.}
+
+\item{config}{string. Defaults to 'auto'. If set to NULL no configuration file is searched for. If set to anything
+but 'auto', that will be the config file override that is used if it exists instead of
+searching for the ../<basename>.yml.}
 
 \item{\dots}{Additional arguments passed to FUN.}
 }
