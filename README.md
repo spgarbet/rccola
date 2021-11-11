@@ -70,7 +70,8 @@ See the [keyring](https://github.com/r-lib/keyring) github page for details on c
 
 The `"service"` used for all keyrings is `"rccola"`. The keyring created by this package will be whatever string you pass as the `keyring=`. Thus API_KEYs could be shared between reports as well via using the same keyring. However, since they are keyed via their variable names--if one used a single keyring for all each RedCap database would need a distinct variable name that would be consistent across projects. Otherwise, there could be a namespace collision and it could load the wrong database into a variable. Be very careful with naming when using a shared keyring between projects. 
 
-If you wish to delete the keys stored in the keyring, simply: `keyring::keyring_delete("your_keyring_name")`.
+If you wish to delete the keys stored in the keyring, simply: `keyring::keyring_delete("your_keyring_name")`. The password to a keyring is established the first time it's created. If you don't remember or there was a mistake this is the method to reset the
+keyring and start over.
 
 ## Forms option
 
