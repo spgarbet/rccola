@@ -161,6 +161,7 @@ drinkREDCap    <- function(variables,
         {
           for(j in forms[[i]])
           {
+            args$form <- j
             assign(paste0(i,".",j), do.call(FUN, args), envir=dest)
           }
         }
