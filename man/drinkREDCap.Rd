@@ -13,6 +13,7 @@ drinkREDCap(
   forms = NULL,
   FUN = sipREDCap,
   config = "auto",
+  assign = TRUE,
   ...
 )
 
@@ -23,6 +24,7 @@ loadFromRedcap(
   forms = NULL,
   FUN = sipREDCap,
   config = "auto",
+  assign = TRUE,
   ...
 )
 }
@@ -42,6 +44,8 @@ The default is to call sipREDCap which is a proxy for \code{\link[redcapAPI]{exp
 \item{config}{string. Defaults to 'auto'. If set to NULL no configuration file is searched for. If set to anything
 but 'auto', that will be the config file override that is used if it exists instead of
 searching for the ../<basename>.yml.}
+
+\item{assign}{logical. Does the function write back the variable to envir or not. Defaults to TRUE.}
 
 \item{\dots}{Additional arguments passed to FUN.}
 }

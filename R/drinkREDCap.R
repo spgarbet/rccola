@@ -88,6 +88,7 @@ key_saved <- function(envir, key)
 #' @param config string. Defaults to 'auto'. If set to NULL no configuration file is searched for. If set to anything
 #'              but 'auto', that will be the config file override that is used if it exists instead of
 #'              searching for the ../<basename>.yml.
+#' @param assign logical. Does the function write back the variable to envir or not. Defaults to TRUE.
 #' @param \dots Additional arguments passed to FUN.
 #' @return Nothing
 #'
@@ -113,23 +114,27 @@ drinkREDCap    <- function(variables,
                            forms     = NULL,
                            FUN       = sipREDCap,
                            config    = 'auto',
+                           assign    = TRUE,
                            ...)
 {
   # Use the global environment for variable storage unless one was specified
   dest <- if(is.null(envir)) globalenv() else envir
 
   # If the variable exists, clear from memory
-  for(i in variables)
+  if(assign)
   {
-    if(is.null(forms) || !(i %in% names(forms)))
+    for(i in variables)
     {
-      if(exists(i, envir=dest, inherits=FALSE)) rm(i, envir=dest)
-    } else
-    {
-      for(j in forms[[i]])
+      if(is.null(forms) || !(i %in% names(forms)))
       {
-        v <- paste0(i, ".", j)
-        if(exists(v, envir=dest, inherits=FALSE)) rm(list=v, envir=dest)
+        if(exists(i, envir=dest, inherits=FALSE)) rm(i, envir=dest)
+      } else
+      {
+        for(j in forms[[i]])
+        {
+          v <- paste0(i, ".", j)
+          if(exists(v, envir=dest, inherits=FALSE)) rm(list=v, envir=dest)
+        }
       }
     }
   }
@@ -156,13 +161,15 @@ drinkREDCap    <- function(variables,
         args$form <- NULL
         if(is.null(forms) || !(i %in% names(forms)))
         {
-          assign(i, do.call(FUN, args), envir=dest)
+          data <-  do.call(FUN, args)
+          if(assign) base::assign(i, data, envir=dest)
         } else
         {
           for(j in forms[[i]])
           {
             args$form <- j
-            assign(paste0(i,".",j), do.call(FUN, args), envir=dest)
+            data <- do.call(FUN, args)
+            if(assign) base::assign(paste0(i,".",j), data, envir=dest)
           }
         }
       },
@@ -220,12 +227,14 @@ drinkREDCap    <- function(variables,
     tryCatch(
       if(is.null(forms) || !(i %in% names(forms)))
       {
-        assign(i, FUN(apiKeyStore[[i]],...), envir=dest)
+        data <- FUN(apiKeyStore[[i]], ...)
+        if(assign) base::assign(i, data, envir=dest)
       } else
       {
         for(j in forms[[i]])
         {
-          assign(paste0(i,".",j), FUN(apiKeyStore[[i]],forms=j,...), envir=dest)
+          data <- FUN(apiKeyStore[[i]],forms=j,...)
+          if(assign) base::assign(paste0(i,".",j), data, envir=dest)
         }
       },
       error = function(e)

@@ -146,3 +146,5 @@ An example yaml configuration file would look something like the following:
     other-config-stuff3: blah blah
     ...
     
+If one doesn't wish for the specified function to be assigned back as a variable
+in the environment, then the `assign=FALSE` argument can be used. This allows for more complex interactions, such as writing back to a RedCap database.
