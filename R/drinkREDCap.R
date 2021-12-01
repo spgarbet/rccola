@@ -89,6 +89,7 @@ key_saved <- function(envir, key)
 #'              but 'auto', that will be the config file override that is used if it exists instead of
 #'              searching for the ../<basename>.yml.
 #' @param assign logical. Does the function write back the variable to envir or not. Defaults to TRUE.
+#' @param passwordFUN function. Function to get the password for the keyring. Defaults to getPass::getPass().
 #' @param \dots Additional arguments passed to FUN.
 #' @return Nothing
 #'
@@ -115,6 +116,7 @@ drinkREDCap    <- function(variables,
                            FUN       = sipREDCap,
                            config    = 'auto',
                            assign    = TRUE,
+                           passwordFUN = getPass::getPass,
                            ...)
 {
   # Use the global environment for variable storage unless one was specified
@@ -127,7 +129,7 @@ drinkREDCap    <- function(variables,
     {
       if(is.null(forms) || !(i %in% names(forms)))
       {
-        if(exists(i, envir=dest, inherits=FALSE)) rm(i, envir=dest)
+        if(exists(i, envir=dest, inherits=FALSE)) rm(list=i, envir=dest)
       } else
       {
         for(j in forms[[i]])
@@ -185,9 +187,9 @@ drinkREDCap    <- function(variables,
 
   if(!is.null(keyring))
   {
-    password <- getPass::getPass(msg =
-      paste0("Please enter the password for the rccola keyring `",
-               keyring, "'"))
+    password <- passwordFUN(msg =
+      paste0("Please enter the password for the rccola keyring ",
+               keyring))
     if(keyring  %in% (keyring::keyring_list()[,1]))
     {
       keyring::keyring_unlock(keyring, password)
@@ -222,7 +224,7 @@ drinkREDCap    <- function(variables,
         apiKeyStore[[i]] <- params[[i]]
       } else # Ask the user for it
       {
-        apiKeyStore[[i]] <- getPass::getPass(msg=paste("Please enter RedCap API_KEY for", i))
+        apiKeyStore[[i]] <- passwordFUN(msg=paste("Please enter RedCap API_KEY for", i))
       }
 
       if(!is.null(keyring))

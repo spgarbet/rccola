@@ -14,6 +14,7 @@ drinkREDCap(
   FUN = sipREDCap,
   config = "auto",
   assign = TRUE,
+  passwordFUN = getPass::getPass,
   ...
 )
 
@@ -25,6 +26,7 @@ loadFromRedcap(
   FUN = sipREDCap,
   config = "auto",
   assign = TRUE,
+  passwordFUN = getPass::getPass,
   ...
 )
 }
@@ -46,6 +48,8 @@ but 'auto', that will be the config file override that is used if it exists inst
 searching for the ../<basename>.yml.}
 
 \item{assign}{logical. Does the function write back the variable to envir or not. Defaults to TRUE.}
+
+\item{passwordFUN}{function. Function to get the password for the keyring. Defaults to getPass::getPass().}
 
 \item{\dots}{Additional arguments passed to FUN.}
 }
