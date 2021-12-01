@@ -63,8 +63,7 @@ The document can now be knitted with `Knit -> Knit with Parameters`. It also wor
 
 ## Keyring Storage
 
-Using a keyring removes the need to knit with parameters and entering the API_KEY with each new session, and the keys are store in local encrypted storage. Only the user specified password
-to the cryptolocker keyring is needed.
+Using a keyring removes the need to knit with parameters and entering the API_KEY with each new session, and the keys are stored in local encrypted storage. Only the user specified password to the cryptolocker keyring is needed once the keyring is created to load the API_KEYs. This is a secure and convenient method and the recommended usage.
 
 See the [keyring](https://github.com/r-lib/keyring) github page for details on configuring your keyring storage to use a preferred service if you desire. It will default to a password protected encrypted user file.
 
@@ -72,6 +71,24 @@ The `"service"` used for all keyrings is `"rccola"`. The keyring created by this
 
 If you wish to delete the keys stored in the keyring, simply: `keyring::keyring_delete("your_keyring_name")`. The password to a keyring is established the first time it's created. If you don't remember or there was a mistake this is the method to reset the
 keyring and start over.
+
+### Mac OS Users
+
+Some versions of MacOS insist on a password with each round trip to the crypto locker.
+If prompted over and over for a password, one can override using the MacOS provided
+crypto locker and use a local filebased one without this issue.
+
+An Rmarkdown header would look something like this to override using the system 
+keyring with this issue.
+    
+    ```{r setup, include=FALSE}
+    knitr::opts_chunk$set(echo = TRUE)
+    
+    library(rccola)
+    
+    options(keyring_backend="file")
+    ```
+
 
 ## Forms option
 
