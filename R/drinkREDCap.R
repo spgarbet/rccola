@@ -182,12 +182,19 @@ drinkREDCap    <- function(variables,
   # Create an environment to house API_KEYS locally
   if(!exists("apiKeyStore", inherits=FALSE)) apiKeyStore <- new.env()
 
-  # Create keyring if it doesn't exist
-  if(!is.null(keyring) &&
-     !(keyring  %in% (keyring::keyring_list()[,1]))
-    )
+
+  if(!is.null(keyring))
   {
-    keyring::keyring_create(keyring)
+    password <- getPass::getPass(msg =
+      paste0("Please enter the password for the rccola keyring `",
+               keyring, "'"))
+    if(keyring  %in% (keyring::keyring_list()[,1]))
+    {
+      keyring::keyring_unlock(keyring, password)
+    } else {
+      # Create keyring if it doesn't exist
+      keyring::keyring_create(keyring, password)
+    }
   }
 
   # For each dataset requested
@@ -220,7 +227,7 @@ drinkREDCap    <- function(variables,
 
       if(!is.null(keyring))
       {
-        keyring::key_set_with_value("rccola", i, apiKeyStore[[i]], keyring)
+        keyring::key_set_with_value("rccola", username=i, password=apiKeyStore[[i]], keyring=keyring)
       }
     }
 
@@ -248,6 +255,7 @@ drinkREDCap    <- function(variables,
       }
     )
   }
+
   return(invisible())
 }
 
