@@ -72,11 +72,14 @@ The `"service"` used for all keyrings is `"rccola"`. The keyring created by this
 If you wish to delete the keys stored in the keyring, simply: `keyring::keyring_delete("your_keyring_name")`. The password to a keyring is established the first time it's created. If you don't remember or there was a mistake this is the method to reset the
 keyring and start over.
 
+To delete a single key from a keyring the command is:
+`keyring::key_delete('rccola', 'your_variable_name', 'your_keyring_name')`
+
 ### Mac OS Users
 
 Some versions of MacOS insist on a password with each round trip to the crypto locker.
 If prompted over and over for a password, one can override using the MacOS provided
-crypto locker and use a local filebased one without this issue.
+crypto locker and use a local file based one without this issue.
 
 An Rmarkdown header would look something like this to override using the system 
 keyring with this issue.
