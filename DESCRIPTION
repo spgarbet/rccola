@@ -1,6 +1,6 @@
 Package: rccola
 Type: Package
-Title: Safely Manage API_KEYS and load data from source such as RedCap
+Title: Safely Manage API Keys and Load Data from a REDCap or Other Source
 Version: 1.0
 Authors@R: c(person("Shawn",    "Garbett",  email = "Shawn.Garbett@vumc.org",        role = c("aut", "cre")),
              person("Hui",      "Wu",       email = "Hui.Wu@vumc.org",               role = c("aut")),
@@ -9,11 +9,12 @@ Authors@R: c(person("Shawn",    "Garbett",  email = "Shawn.Garbett@vumc.org",   
 Author: Shawn Garbett [aut, cre],
   Hui Wu [aut],
   Cole Beck [aut]
-Maintainer: Shawn Garbett <Shawn@Garbett.org>
-Description: The handling of an API_KEY (misnomer for password) for protected
+Maintainer: Shawn Garbett <Shawn.Garbett@vumc.org>
+Description: The handling of an API key (misnomer for password) for protected
     data can be difficult. This package provides secure convenience functions for 
-    entering / handling API_KEYs and pulling data directly into memory. By default
-    it will load from REDCap instances.
+    entering / handling API keys and pulling data directly into memory. By default
+    it will load from REDCap instances, but other sources are injectible via
+    inversion of control.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
