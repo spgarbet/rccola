@@ -13,7 +13,7 @@ Maintainer: Shawn Garbett <Shawn.Garbett@vumc.org>
 Description: The handling of an API key (misnomer for password) for protected
     data can be difficult. This package provides secure convenience functions for 
     entering / handling API keys and pulling data directly into memory. By default
-    it will load from REDCap instances, but other sources are injectible via
+    it will load from REDCap instances, but other sources are injectable via
     inversion of control.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
