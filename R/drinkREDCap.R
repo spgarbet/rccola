@@ -25,6 +25,7 @@ globalVariables("params")
 #'
 #' @param key the api key of interest. The package provides this.
 #' @param ... Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.
+#' @return data.frame containing requested REDCap data.
 #'
 #' @importFrom redcapAPI redcapConnection
 #' @importFrom redcapAPI exportRecords

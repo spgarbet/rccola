@@ -11,6 +11,9 @@ sipREDCap(key, ...)
 
 \item{...}{Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.}
 }
+\value{
+data.frame containing requested REDCap data.
+}
 \description{
 Default function to read from REDCap
 }

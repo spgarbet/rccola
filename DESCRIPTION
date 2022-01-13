@@ -15,7 +15,7 @@ Description: The handling of an API key (misnomer for password) for protected
     entering / handling API keys and pulling data directly into memory. By default
     it will load from REDCap instances, but other sources are injectable via
     inversion of control.
-License: GPL-3 + file LICENSE
+License: GPL-3 
 Encoding: UTF-8
 LazyData: true
 Imports: redcapAPI, getPass, yaml, keyring
