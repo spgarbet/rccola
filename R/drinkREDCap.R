@@ -20,11 +20,36 @@ globalVariables("params")
 
   #############################################################################
  ##
+##
+#' Alternate metadata function to read just the meta data from REDCap
+#'
+#' @param key the api key of interest. The package provides this.
+#' @param ... Additional arguments passed to \code{\link[redcapAPI]{exportMetaData}}. Should contain url as an argument.
+#' @return data.frame containing requested REDCap data.
+#'
+#' @importFrom redcapAPI redcapConnection
+#' @importFrom redcapAPI exportMetaData
+#'
+#' @examples
+#' \dontrun{data <- metaREDCap(keyring::key_get("rccola", "database_name", "project_name"))}
+#'
+#' @export
+metaREDCap <- function(key, ...)
+{
+  args <- list(...)
+  redcapAPI::exportMetaData(
+    redcapAPI::redcapConnection(
+      url=args[["url"]],
+      token=key),
+    ...)
+}
+  #############################################################################
+ ##
 ## The default read from REDCap function
 #' Default function to read from REDCap
 #'
 #' @param key the api key of interest. The package provides this.
-#' @param ... Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.
+#' @param ... Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}. Should contain url as an argument.
 #' @return data.frame containing requested REDCap data.
 #'
 #' @importFrom redcapAPI redcapConnection
@@ -157,28 +182,24 @@ drinkREDCap    <- function(variables,
     keys   <- config$keys
     args   <- c(config$args, list(...))
 
-    tryCatch(
-      for(i in variables)
+    for(i in variables)
+    {
+      args$key  <- keys[[i]]
+      args$form <- NULL
+      if(is.null(forms) || !(i %in% names(forms)))
       {
-        args$key  <- keys[[i]]
-        args$form <- NULL
-        if(is.null(forms) || !(i %in% names(forms)))
+        data <-  do.call(FUN, args)
+        if(assign) base::assign(i, data, envir=dest)
+      } else
+      {
+        for(j in forms[[i]])
         {
-          data <-  do.call(FUN, args)
-          if(assign) base::assign(i, data, envir=dest)
-        } else
-        {
-          for(j in forms[[i]])
-          {
-            args$form <- j
-            data <- do.call(FUN, args)
-            if(assign) base::assign(paste0(i,".",j), data, envir=dest)
-          }
+          args$form <- j
+          data <- do.call(FUN, args)
+          if(assign) base::assign(paste0(i,".",j), data, envir=dest)
         }
-      },
-      error=function(e) stop(e)
-    )
-
+      }
+    }
     return(invisible())
   }
 
@@ -234,7 +255,7 @@ drinkREDCap    <- function(variables,
       }
     }
 
-    tryCatch(
+    withCallingHandlers(
       if(is.null(forms) || !(i %in% names(forms)))
       {
         data <- FUN(apiKeyStore[[i]], ...)

@@ -9,7 +9,7 @@ sipREDCap(key, ...)
 \arguments{
 \item{key}{the api key of interest. The package provides this.}
 
-\item{...}{Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}.}
+\item{...}{Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}. Should contain url as an argument.}
 }
 \value{
 data.frame containing requested REDCap data.
