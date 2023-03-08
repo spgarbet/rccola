@@ -2,7 +2,6 @@
 % Please edit documentation in R/drinkREDCap.R
 \name{drinkREDCap}
 \alias{drinkREDCap}
-\alias{loadFromRedcap}
 \title{Provide API_KEYs to function (defaults to load from REDCap) and load
 data into memory.}
 \usage{
@@ -17,21 +16,13 @@ drinkREDCap(
   passwordFUN = getPass::getPass,
   ...
 )
-
-loadFromRedcap(
-  variables,
-  keyring = NULL,
-  envir = NULL,
-  forms = NULL,
-  FUN = sipREDCap,
-  config = "auto",
-  assign = TRUE,
-  passwordFUN = getPass::getPass,
-  ...
-)
 }
 \arguments{
-\item{variables}{character vector. A list of strings that define the variables with associated API_KEYs to load into memory.}
+\item{variables}{character vector. A list of strings that define the
+variables with associated API_KEYs to load into memory. Each
+name should correspond to a REDCap project. It can be a named
+vector, the names refer to the variables to assign the output
+too for the name of the REDCap project associated with the key.}
 
 \item{keyring}{character. Potential keyring, not used by default.}
 

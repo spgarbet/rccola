@@ -18,53 +18,6 @@
 # For pulling from knit with parameters
 globalVariables("params")
 
-  #############################################################################
- ##
-##
-#' Alternate metadata function to read just the meta data from REDCap
-#'
-#' @param key the api key of interest. The package provides this.
-#' @param ... Additional arguments passed to \code{\link[redcapAPI]{exportMetaData}}. Should contain url as an argument.
-#' @return data.frame containing requested REDCap data.
-#'
-#' @importFrom redcapAPI redcapConnection
-#' @importFrom redcapAPI exportMetaData
-#'
-#' @examples
-#' \dontrun{data <- metaREDCap(keyring::key_get("rccola", "database_name", "project_name"))}
-#'
-#' @export
-metaREDCap <- function(key, ...)
-{
-  args <- list(...)
-  redcapAPI::exportMetaData(
-    redcapAPI::redcapConnection(
-      url=args[["url"]],
-      token=key),
-    ...)
-}
-  #############################################################################
- ##
-## The default read from REDCap function
-#' Default function to read from REDCap
-#'
-#' @param key the api key of interest. The package provides this.
-#' @param ... Additional arguments passed to \code{\link[redcapAPI]{exportRecords}}. Should contain url as an argument.
-#' @return data.frame containing requested REDCap data.
-#'
-#' @importFrom redcapAPI redcapConnection
-#' @importFrom redcapAPI exportRecords
-#'
-#' @examples
-#' \dontrun{data <- sipREDCap(keyring::key_get("rccola", "database_name", "project_name"))}
-#'
-#' @export
-sipREDCap <- function(key, ...)
-{
-  args <- list(...)
-  redcapAPI::exportRecords(redcapAPI::redcapConnection(url=args[["url"]],token=key), ...)
-}
-
 
   #############################################################################
  ##
@@ -104,7 +57,11 @@ key_saved <- function(envir, key)
 #'
 #' An older loadFromRedcap function maps to this for backward compatibility.
 #'
-#' @param variables character vector. A list of strings that define the variables with associated API_KEYs to load into memory.
+#' @param variables character vector. A list of strings that define the
+#'          variables with associated API_KEYs to load into memory. Each
+#'          name should correspond to a REDCap project. It can be a named
+#'          vector, the names refer to the variables to assign the output
+#'          too for the name of the REDCap project associated with the key.
 #' @param envir environment. The target environment for the data. Defaults to .Global
 #' @param keyring character. Potential keyring, not used by default.
 #' @param forms list. A list of forms. Keys are the variable(api_key), each key can contain a vector of forms.
@@ -150,19 +107,21 @@ drinkREDCap    <- function(variables,
   # Use the global environment for variable storage unless one was specified
   dest <- if(is.null(envir)) globalenv() else envir
 
+  varnames <- if(is.null(names(variables))) variables else names(variables)
+
   # If the variable exists, clear from memory
   if(assign)
   {
-    for(i in variables)
+    for(i in seq_along(variables))
     {
-      if(is.null(forms) || !(i %in% names(forms)))
+      if(is.null(forms) || !(variables[i] %in% names(forms)))
       {
-        if(exists(i, envir=dest, inherits=FALSE)) rm(list=i, envir=dest)
+        if(exists(varnames[i], envir=dest, inherits=FALSE)) rm(list=varnames[i], envir=dest)
       } else
       {
-        for(j in forms[[i]])
+        for(j in forms[[variables[i]]])
         {
-          v <- paste0(i, ".", j)
+          v <- paste0(varnames[i], ".", j)
           if(exists(v, envir=dest, inherits=FALSE)) rm(list=v, envir=dest)
         }
       }
@@ -184,21 +143,21 @@ drinkREDCap    <- function(variables,
     keys   <- config$keys
     args   <- c(config$args, list(...))
 
-    for(i in variables)
+    for(i in seq_along(variables))
     {
-      args$key  <- keys[[i]]
+      args$key  <- keys[[variables[i]]]
       args$form <- NULL
-      if(is.null(forms) || !(i %in% names(forms)))
+      if(is.null(forms) || !(variables[i] %in% names(forms)))
       {
         data <-  do.call(FUN, args)
-        if(assign) base::assign(i, data, envir=dest)
+        if(assign) base::assign(varnames[i], data, envir=dest)
       } else
       {
-        for(j in forms[[i]])
+        for(j in forms[[variables[i]]])
         {
           args$form <- j
           data <- do.call(FUN, args)
-          if(assign) base::assign(paste0(i,".",j), data, envir=dest)
+          if(assign) base::assign(paste0(varnames[i],".",j), data, envir=dest)
         }
       }
     }
@@ -235,58 +194,58 @@ drinkREDCap    <- function(variables,
   }
 
   # For each dataset requested
-  for(i in variables)
+  for(i in seq_along(variables))
   {
     # If the API_KEY doesn't exist go look for it
 
     # Does it exist in a secret keyring, use that
-    if(!key_saved(apiKeyStore, i))
+    if(!key_saved(apiKeyStore, variables[i]))
     {
       if(!is.null(keyring) &&
          keyring %in% (keyring::keyring_list()[,1]) &&
-         i %in% keyring::key_list("rccola", keyring)[,2])
+         variables[i] %in% keyring::key_list("rccola", keyring)[,2])
       {
-        apiKeyStore[[i]] <- keyring::key_get("rccola", i, keyring)
+        apiKeyStore[[variables[i]]] <- keyring::key_get("rccola", variables[i], keyring)
       }
     }
     # Check again if it's set properly
-    if(!key_saved(apiKeyStore, i))
+    if(!key_saved(apiKeyStore, variables[i]))
     {
       # Pull from knit with params if that exists
-      if(exists("params") && !is.null(params[[i]]) && params[[i]] != "")
+      if(exists("params") && !is.null(params[[variables[i]]]) && params[[variables[i]]] != "")
       {
         # Pull from Rmarkdown parameters
-        apiKeyStore[[i]] <- params[[i]]
+        apiKeyStore[[variables[i]]] <- params[[variables[i]]]
       } else # Ask the user for it
       {
-        apiKeyStore[[i]] <- passwordFUN(msg=paste("Please enter RedCap API_KEY for", i))
+        apiKeyStore[[variables[i]]] <- passwordFUN(msg=paste("Please enter RedCap API_KEY for", variables[i]))
       }
 
       if(!is.null(keyring))
       {
-        keyring::key_set_with_value("rccola", username=i, password=apiKeyStore[[i]], keyring=keyring)
+        keyring::key_set_with_value("rccola", username=i, password=apiKeyStore[[variables[i]]], keyring=keyring)
       }
     }
 
     withCallingHandlers(
-      if(is.null(forms) || !(i %in% names(forms)))
+      if(is.null(forms) || !(variables[i] %in% names(forms)))
       {
-        data <- FUN(apiKeyStore[[i]], ...)
-        if(assign) base::assign(i, data, envir=dest)
+        data <- FUN(apiKeyStore[[variables[i]]], ...)
+        if(assign) base::assign(varnames[i], data, envir=dest)
       } else
       {
         for(j in forms[[i]])
         {
-          data <- FUN(apiKeyStore[[i]],forms=j,...)
-          if(assign) base::assign(paste0(i,".",j), data, envir=dest)
+          data <- FUN(apiKeyStore[[variables[i]]],forms=j,...)
+          if(assign) base::assign(paste0(varnames[i],".",j), data, envir=dest)
         }
       },
       error = function(e)
       {
         if(substr(e$message, 1, 3) == "403")
         {
-          rm(i, envir = apiKeyStore)
-          if(!is.null(keyring)) keyring::key_delete("rccola", i, keyring)
+          rm(varnames[i], envir = apiKeyStore)
+          if(!is.null(keyring)) keyring::key_delete("rccola", variables[i], keyring)
         }
         stop(e)
       }
@@ -295,7 +254,3 @@ drinkREDCap    <- function(variables,
 
   return(invisible())
 }
-
-#' @rdname drinkREDCap
-#' @export
-loadFromRedcap <- drinkREDCap
