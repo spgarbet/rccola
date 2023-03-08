@@ -131,6 +131,8 @@ key_saved <- function(envir, key)
 #' @importFrom keyring key_set_with_value
 #' @importFrom keyring keyring_create
 #' @importFrom keyring keyring_list
+#' @importFrom keyring keyring_unlock
+#' @importFrom keyring keyring_is_locked
 #'
 #' @rdname drinkREDCap
 #' @export
@@ -206,16 +208,27 @@ drinkREDCap    <- function(variables,
   # Create an environment to house API_KEYS locally
   if(!exists("apiKeyStore", inherits=FALSE)) apiKeyStore <- new.env()
 
-
+  # Was a keyring specified?
   if(!is.null(keyring))
   {
-    password <- passwordFUN(msg =
-      paste0("Please enter the password for the rccola keyring ",
-               keyring))
-    if(keyring  %in% (keyring::keyring_list()[,1]))
+    state <- keyring::keyring_list()
+    state <- state[state$keyring==keyring,]
+
+    # If so, does it exist?
+    if(nrow(state) == 1)
     {
-      keyring::keyring_unlock(keyring, password)
-    } else {
+      # Is it locked
+      if(state$locked)
+      {
+        password <- passwordFUN(msg =
+          paste0("Please enter password to unlock rccola keyring ",keyring, " "))
+        keyring::keyring_unlock(keyring, password)
+      }
+    } else # Keyring does not exist
+    {
+      password <- passwordFUN(msg =
+        paste0("Creating keyring. Enter password for the rccola keyring ",
+               keyring, " "))
       # Create keyring if it doesn't exist
       keyring::keyring_create(keyring, password)
     }
