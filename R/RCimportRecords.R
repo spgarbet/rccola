@@ -21,13 +21,14 @@ bottleREDCap <- function(key, ...)
   redcapAPI::importRecords(redcapAPI::redcapConnection(url=args[["url"]],token=key), ...)
 }
 
-#' importRecords to REDCap
+#' Import records to REDCap
 #'
-#' importRecords to REDCap directly into environment variables requested using
+#' Import records to REDCap directly into environment variables requested using
 #' API_KEY stored in keyring.
 #'
 #' @param database character; The name given to the REDCap database.
 #' @param data data.frame; The data.frame of records to write the database.
+#' @param keyring character; Keyring to look up database API_KEY from
 #' @param url character; The url of the REDCap server
 #' @param ... Additional arguments passed to \code{\link[redcapAPI]{importRecords}}. Should contain url as an argument.
 #' @return invisible NULL
@@ -36,9 +37,9 @@ bottleREDCap <- function(key, ...)
 #' \dontrun{exportRecords(c("test"="testDatabase"), keyring="test", url="http://someurl.here")}
 #'
 #' @export
-importRecords <- function(database, data, ...)
+RCimportRecords <- function(database, data, keyring, url, ...)
 {
   if(length(database) > 1) stop("importRecords can only deal with one REDCap database at a time")
-  drinkREDCap(variables=database, data=data, url=url, FUN=bottleREDCap, ...)
+  drinkREDCap(variables=database, data=data, keyring=keyring, url=url, FUN=bottleREDCap, ...)
 }
 

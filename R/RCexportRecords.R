@@ -37,22 +37,24 @@ sipREDCap <- function(key, ...)
   redcapAPI::exportRecords(redcapAPI::redcapConnection(url=args[["url"]],token=key), ...)
 }
 
-#' exportRecords from REDCap
+#' Export records from REDCap
 #'
-#' exportRecords from multiple REDCap databases directly into environment
+#' Export records from multiple REDCap databases directly into environment
 #' variables requested using API_KEY stored in keyring.
 #'
 #' @param databases character; vector of REDCap databases to export records from.
 #'    Can be a named vector, and the name is used as the environment variable
 #'    to store resulting data in.
+#' @param keyring character; keyring to use to find API_KEY of database
 #' @param url character; url of REDCap server
 #' @param ... Additional arguments passed to \code{\link[rccola]{drinkREDCap}}
 #' which in turn passes most to \code{\link[redcapAPI]{exportRecords}}.
 #' @return invisible NULL
 #'
 #' @examples
-#' \dontrun{exportRecords(c("test"="testDatabase"), keyring="test", url="http://someurl.here")}
+#' \dontrun{RCexportRecords(c("test"="testDatabase"), keyring="test", url="http://someurl.here")}
 #'
 #' @export
-exportRecords <- function(variables=databases, url, ...) drinkREDCap(FUN = sipREDCap, ...)
+RCexportRecords <- function(databases, keyring, url, ...)
+    drinkREDCap(databases, keyring=keyring, url=url, FUN = sipREDCap,  ...)
 

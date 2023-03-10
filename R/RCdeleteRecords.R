@@ -21,24 +21,25 @@ recycleREDCap <- function(key, ...)
   redcapAPI::importRecords(redcapAPI::redcapConnection(url=args[["url"]],token=key), ...)
 }
 
-#' importRecords to REDCap
+#' Import records to REDCap
 #'
-#' importRecords to REDCap directly into environment variables requested using
-#' API_KEY stored in keyring.
+#' Impmort records to REDCap directly and return results in environment variables
+#' requested using API_KEY stored in keyring.
 #'
 #' @param database character; The name given to the REDCap database.
 #' @param records character; A vector of record_ids to delete
+#' @param keyring character; Name of keyring
 #' @param url character; The url of the REDCap server
 #' @param ... Additional arguments passed to \code{\link[redcapAPI]{deleteRecords}}. Should contain url as an argument.
 #' @return invisible NULL
 #'
 #' @examples
-#' \dontrun{exportRecords(c("test"="testDatabase"), keyring="test", url="http://someurl.here")}
+#' \dontrun{RCdeleteRecords(c("test"="testDatabase"), keyring="test", url="http://someurl.here")}
 #'
 #' @export
-deleteRecords <- function(database, records, ...)
+RCdeleteRecords <- function(database, records, keyring, url, ...)
 {
   if(length(database) > 1) stop("deleteRecords can only deal with one REDCap database at a time")
-  drinkREDCap(variables=database, records=records, url=url, FUN=bottleREDCap, ...)
+  drinkREDCap(variables=database, records=records, keyring=keyring, url=url, FUN=bottleREDCap, ...)
 }
 
