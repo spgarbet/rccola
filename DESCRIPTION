@@ -1,7 +1,7 @@
 Package: rccola
 Type: Package
 Title: Safely Manage API Keys and Load Data from a REDCap or Other Source
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: c(person("Shawn",    "Garbett",  email = "Shawn.Garbett@vumc.org",        role = c("aut", "cre")),
              person("Hui",      "Wu",       email = "Hui.Wu@vumc.org",               role = c("aut")),
              person("Cole",     "Beck",     email = "Cole.Beck@vumc.org",            role = c("aut"))

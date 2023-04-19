@@ -223,7 +223,7 @@ drinkREDCap    <- function(variables,
 
       if(!is.null(keyring))
       {
-        keyring::key_set_with_value("rccola", username=i, password=apiKeyStore[[variables[i]]], keyring=keyring)
+        keyring::key_set_with_value("rccola", username=variables[i], password=apiKeyStore[[variables[i]]], keyring=keyring)
       }
     }
 
